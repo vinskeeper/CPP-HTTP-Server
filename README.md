@@ -6,7 +6,6 @@ It serves static files (like `index.html`) and also provides simple API endpoint
 ## ✨ Features
 - Runs an HTTP server on default port **80** or a custom port.  
 - `/` endpoint serves an interactive `index.html`.  
-- Interactive `index.html` with a **Check Server** button that shows a notification including server status and response time (ping in ms).  
 - Cross-platform support: Windows & Linux (OS detection included).  
 
 ## 📂 Project Structure
