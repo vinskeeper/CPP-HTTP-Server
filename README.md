@@ -42,6 +42,6 @@ http://127.0.0.1:80
 
 Homepage button Check Server triggers a notification with server status + latency (ms).
 
-📜 License
+## 📜 License
 
 MIT License © 2025
