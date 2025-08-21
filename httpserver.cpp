@@ -12,13 +12,13 @@ int main() {
 
     // Serve index.html di "/"
     svr.Get("/", [](const httplib::Request&, httplib::Response& res) {
-        std::ifstream f("public/index.html");
+        ifstream f("public/index.html");
         if (!f) {
             res.status = 404;
             res.set_content("index.html not found", "text/plain");
             return;
         }
-        std::stringstream buf;
+        stringstream buf;
         buf << f.rdbuf();
         res.set_content(buf.str(), "text/html");
         });
@@ -39,4 +39,5 @@ int main() {
     cout << "Server is running on http://127.0.0.1:" << serverPort << endl;
 
     svr.listen("127.0.0.1", serverPort);
+
 }
