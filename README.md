@@ -11,12 +11,13 @@ It serves static files (like `index.html`) and also provides simple API endpoint
 - Cross-platform support: Windows & Linux (OS detection included).  
 
 ## 📂 Project Structure
+```bash
 CPP-HTTP-Server/
 ├── public/
 │ └── index.html # main web page
 ├── httplib.h # cpp-httplib header
 └── server.cpp # main server code
-
+```
 ## ⚙️ Build & Run  
 
 ### 🔹 Windows (MSVC / MinGW)
@@ -36,11 +37,9 @@ Open your browser and navigate to:
 
 http://127.0.0.1:80
 
-🖥️ Demo
+## 🖥️ Demo
 
 / → Displays the interactive homepage (index.html).
-
-/hi → Returns a plain text Hello World!.
 
 Homepage button Check Server triggers a notification with server status + latency (ms).
 
