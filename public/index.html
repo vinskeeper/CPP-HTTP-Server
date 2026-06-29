@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PgConnect | C++ & PostgreSQL Integration Sandbox</title>
+  <!-- SEO & Social Meta -->
+  <meta name="description" content="A premium developer sandbox for testing C++ http server integration with PostgreSQL using cpp-httplib and pqxx." />
+  <meta name="keywords" content="C++, PostgreSQL, HTTP Server, cpp-httplib, pqxx, API testing, database integration" />
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- External Stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <header>
+    <div class="container header-content">
+      <div class="logo-area">
+        <i data-lucide="database" class="logo-icon"></i>
+        <span>PgConnect DB-Bench</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <a href="https://github.com/vinskeeper" target="_blank" class="creator-badge" aria-label="GitHub Profile of vinskeeper">
+          <i data-lucide="github"></i>
+          <span>vinskeeper</span>
+        </a>
+        <div class="server-status-badge" id="serverBadge">
+          <div class="status-dot"></div>
+          <span id="serverBadgeText">Monitoring Server</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero Banner -->
+    <section class="hero">
+      <div class="badge-hero">
+        <i data-lucide="cpu" style="width: 14px; height: 14px;"></i>
+        C++ cpp-httplib & pqxx Sandbox
+      </div>
+      <h1>C++ HTTP Server & PostgreSQL Test Bench</h1>
+      <p>An interactive developer console built to run live integration tests, benchmark latency overheads, generate schema config, and diagnose connectivity between C++ servers and PostgreSQL databases.</p>
+    </section>
+
+    <!-- Interactive Grid Dashboard -->
+    <section class="dashboard-grid">
+      
+      <!-- Left Column: Testing Console & Config -->
+      <div style="display: flex; flex-direction: column; gap: 32px;">
+        
+        <!-- Live Test Console Card -->
+        <div class="glass-card">
+          <div class="console-header">
+            <h2 class="card-title">
+              <i data-lucide="terminal"></i> Interactive Query Sandbox
+            </h2>
+            <div class="console-controls">
+              <button class="btn btn-secondary" id="clearConsoleBtn">Clear</button>
+              <button class="btn btn-primary" id="runTestBtn">
+                <i data-lucide="play" style="width: 16px; height: 16px;"></i> Run Query Test
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulation Controls Sub-bar -->
+          <div class="console-sub-bar">
+            <div class="sim-mode-badge">
+              <label class="toggle-switch">
+                <input type="checkbox" id="demoModeToggle">
+                <span class="toggle-slider"></span>
+              </label>
+              <span>Demo Simulation Mode</span>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Scenario:</span>
+              <select id="simScenario" class="input-control" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 8px; background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.05); height: auto; color: var(--text-secondary);">
+                <option value="success">Success (Query Executed)</option>
+                <option value="db_error">DB Offline (Connection Fail)</option>
+                <option value="auth_error">Auth Error (Wrong Pass)</option>
+                <option value="timeout">Network Timeout</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Quick Stats Indicators -->
+          <div class="ping-dashboard-row">
+            <div class="stat-badge">
+              <div class="stat-label">Last Latency</div>
+              <div class="stat-value cyan" id="statLatency">-- ms</div>
+            </div>
+            <div class="stat-badge">
+              <div class="stat-label">Status</div>
+              <div class="stat-value" id="statStatus">No Run</div>
+            </div>
+            <div class="stat-badge">
+              <div class="stat-label">Total Runs</div>
+              <div class="stat-value success" id="statRuns">0</div>
+            </div>
+          </div>
+
+          <!-- Latency Graph -->
+          <div class="latency-chart-card">
+            <div class="chart-header">
+              <span class="chart-title">
+                <i data-lucide="bar-chart-2" style="width: 14px; height: 14px;"></i>
+                Latency History (Last 5 Pings)
+              </span>
+              <span style="font-size: 0.75rem; color: var(--text-muted);" id="avgLatency">Avg: -- ms</span>
+            </div>
+            <div class="chart-container" id="latencyChart">
+              <div class="chart-grid-line chart-grid-20ms"><span class="chart-grid-label">20ms</span></div>
+              <div class="chart-grid-line chart-grid-50ms"><span class="chart-grid-label">50ms</span></div>
+              <div class="chart-grid-line chart-grid-100ms"><span class="chart-grid-label">100ms</span></div>
+              
+              <!-- Empty placeholders to animate later -->
+              <div class="chart-bar-wrapper">
+                <div class="chart-bar" style="height: 0%;"><span class="chart-tooltip">N/A</span></div>
+                <span class="chart-bar-label">#1</span>
+              </div>
+              <div class="chart-bar-wrapper">
+                <div class="chart-bar" style="height: 0%;"><span class="chart-tooltip">N/A</span></div>
+                <span class="chart-bar-label">#2</span>
+              </div>
+              <div class="chart-bar-wrapper">
+                <div class="chart-bar" style="height: 0%;"><span class="chart-tooltip">N/A</span></div>
+                <span class="chart-bar-label">#3</span>
+              </div>
+              <div class="chart-bar-wrapper">
+                <div class="chart-bar" style="height: 0%;"><span class="chart-tooltip">N/A</span></div>
+                <span class="chart-bar-label">#4</span>
+              </div>
+              <div class="chart-bar-wrapper">
+                <div class="chart-bar" style="height: 0%;"><span class="chart-tooltip">N/A</span></div>
+                <span class="chart-bar-label">#5</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Output Terminal -->
+          <div class="terminal-window">
+            <div class="terminal-header">
+              <div class="terminal-dots">
+                <div class="terminal-dot td-red"></div>
+                <div class="terminal-dot td-yellow"></div>
+                <div class="terminal-dot td-green"></div>
+              </div>
+              <span class="terminal-title">Query Terminal Output</span>
+              <button class="terminal-action-btn" id="copyTerminalBtn" title="Copy response content">
+                <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
+              </button>
+            </div>
+            <div class="terminal-body" id="consoleBody">
+              <span>Ready. Press "Run Query Test" to fetch db-time status from C++ server...</span><span class="terminal-cursor"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connection String Builder -->
+        <div class="glass-card">
+          <h2 class="card-title">
+            <i data-lucide="settings"></i> pqxx Connection Builder
+          </h2>
+          <p class="doc-desc" style="margin-bottom: 20px;">Configure your PostgreSQL connection parameters. The C++ pqxx connector string below will update dynamically.</p>
+          
+          <div class="form-group-grid">
+            <div class="input-field">
+              <label for="dbHost">Host Address</label>
+              <input type="text" id="dbHost" class="input-control" value="127.0.0.1" placeholder="e.g. 127.0.0.1" />
+            </div>
+            <div class="input-field">
+              <label for="dbPort">Port</label>
+              <input type="text" id="dbPort" class="input-control" value="5432" placeholder="e.g. 5432" />
+            </div>
+          </div>
+          <div class="form-group-grid">
+            <div class="input-field">
+              <label for="dbName">Database Name</label>
+              <input type="text" id="dbName" class="input-control" value="postgres" placeholder="e.g. postgres" />
+            </div>
+            <div class="input-field">
+              <label for="dbUser">Username</label>
+              <input type="text" id="dbUser" class="input-control" value="postgres" placeholder="e.g. postgres" />
+            </div>
+          </div>
+          <div class="input-field" style="margin-bottom: 20px;">
+            <label for="dbPassword">Password</label>
+            <input type="password" id="dbPassword" class="input-control" value="root" placeholder="Enter password" />
+          </div>
+
+          <div class="code-output-card">
+            <div class="code-output-header">
+              <span>C++ pqxx Connection String</span>
+              <button class="copy-btn" id="copyConnStringBtn">
+                <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
+              </button>
+            </div>
+            <div class="code-output-body" id="connStringCode">pqxx::connection c("dbname=postgres user=postgres password=root hostaddr=127.0.0.1 port=5432");</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: System Diagram & Technical Docs -->
+      <div style="display: flex; flex-direction: column; gap: 32px;">
+        
+        <!-- System Data Flow Diagram -->
+        <div class="glass-card">
+          <h2 class="card-title">
+            <i data-lucide="git-fork"></i> Integration Topology
+          </h2>
+          <p class="doc-desc" style="margin-bottom: 16px;">Hover or click on components in the request cycle to see their technical role.</p>
+          
+          <div class="flow-diagram-wrapper">
+            <!-- Step 1 -->
+            <div class="diagram-step" id="diagramBrowser" data-info="The client web browser issues asynchronous AJAX pings to the API router hosted on the C++ httplib server. Uses fetch() APIs.">
+              <div class="step-icon-box">
+                <i data-lucide="chrome"></i>
+              </div>
+              <div class="step-details">
+                <div class="step-title">Client Browser <span class="step-tech">JavaScript / fetch</span></div>
+                <div class="step-desc">Triggers HTTP requests to server endpoints</div>
+              </div>
+            </div>
+
+            <div class="diagram-connector">
+              <div class="connector-line"></div>
+              <i data-lucide="chevron-down" class="connector-arrow"></i>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="diagram-step" id="diagramServer" data-info="C++ HTTP Server powered by yhirose/cpp-httplib. Catches calls on '/api/db-time', processes queries asynchronously, and serves statically cached assets on '/' dynamically.">
+              <div class="step-icon-box">
+                <i data-lucide="server"></i>
+              </div>
+              <div class="step-details">
+                <div class="step-title">HTTP Router <span class="step-tech">C++ / cpp-httplib</span></div>
+                <div class="step-desc">Accepts connection and maps requests to controllers</div>
+              </div>
+            </div>
+
+            <div class="diagram-connector">
+              <div class="connector-line"></div>
+              <i data-lucide="chevron-down" class="connector-arrow"></i>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="diagram-step" id="diagramDriver" data-info="Native PostgreSQL C++ connector library (pqxx). Manages database transactions, object mapping, and queries safely using standard libpq client bindings.">
+              <div class="step-icon-box">
+                <i data-lucide="pocket"></i>
+              </div>
+              <div class="step-details">
+                <div class="step-title">pqxx DB Connector <span class="step-tech">libpqxx driver</span></div>
+                <div class="step-desc">Fires queries and marshals raw tuples to C++ objects</div>
+              </div>
+            </div>
+
+            <div class="diagram-connector">
+              <div class="connector-line"></div>
+              <i data-lucide="chevron-down" class="connector-arrow"></i>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="diagram-step" id="diagramPostgres" data-info="Relational database instance containing target schemas. Running on default TCP port 5432, evaluating query ASTs, and returning tuples.">
+              <div class="step-icon-box">
+                <i data-lucide="database"></i>
+              </div>
+              <div class="step-details">
+                <div class="step-title">PostgreSQL Database <span class="step-tech">v15+ Instance</span></div>
+                <div class="step-desc">Executes engine processes, returns 'current_timestamp'</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert-box alert-info" id="diagramExplainBox" style="margin-top: 10px; margin-bottom: 0;">
+            <i data-lucide="info"></i>
+            <div>
+              <strong>Topology Details:</strong> Click any of the elements above to view a detailed breakdown of its function in the data flow.
+            </div>
+          </div>
+        </div>
+
+        <!-- Documentation Tabs -->
+        <div class="glass-card">
+          <h2 class="card-title">
+            <i data-lucide="book-open"></i> Technical Reference
+          </h2>
+          
+          <div class="tab-system">
+            <div class="tab-nav">
+              <button class="tab-btn active" onclick="switchTab(event, 'tabSource')">
+                <i data-lucide="code" style="width: 14px; height: 14px;"></i> Server Code
+              </button>
+              <button class="tab-btn" onclick="switchTab(event, 'tabBuild')">
+                <i data-lucide="terminal" style="width: 14px; height: 14px;"></i> Build & Run
+              </button>
+              <button class="tab-btn" onclick="switchTab(event, 'tabDiagnose')">
+                <i data-lucide="activity" style="width: 14px; height: 14px;"></i> Troubleshoot
+              </button>
+            </div>
+
+            <!-- Tab: C++ Server Code -->
+            <div class="tab-pane active" id="tabSource">
+              <p class="doc-desc">Endpoint handler inside <code>httpserver.cpp</code>. It establishes a short-lived connection context, runs a simple select query, and returns JSON.</p>
+              
+              <div class="doc-snippet">
+                <div class="doc-snippet-title">
+                  <span>GET /api/db-time Handler</span>
+                  <button class="copy-btn" onclick="copySnippet(this)">Copy</button>
+                </div>
+                <pre><code>svr.Get("/api/db-time", [](const httplib::Request &, httplib::Response &res) {
+  try {
+    pqxx::connection c("dbname=postgres user=postgres password=root hostaddr=127.0.0.1 port=5432");
+    if (c.is_open()) {
+      pqxx::work w(c);
+      pqxx::result r = w.exec("SELECT current_timestamp;");
+      
+      std::string db_time = r[0][0].c_str();
+      std::string json_res = R"({"status": "success", "db_time": ")" + db_time + R"("})";
+      res.set_content(json_res, "application/json");
+    } else {
+      res.status = 500;
+      res.set_content(R"({"status": "error", "message": "Gagal membuka database"})", "application/json");
+    }
+  } catch (const std::exception &e) {
+    res.status = 500;
+    res.set_content(R"({"status": "error", "message": ")" + std::string(e.what()) + R"("})", "application/json");
+  }
+});</code></pre>
+              </div>
+            </div>
+
+            <!-- Tab: Build & Setup -->
+            <div class="tab-pane" id="tabBuild">
+              <p class="doc-desc">Compiling on Windows and Linux requires linking against ws2_32 (Windows networking) and PostgreSQL dependencies (libpq, libpqxx).</p>
+              
+              <div class="doc-snippet">
+                <div class="doc-snippet-title">
+                  <span>Windows Compilation (g++)</span>
+                  <button class="copy-btn" onclick="copySnippet(this)">Copy</button>
+                </div>
+                <pre><code>g++ httpserver.cpp -o httpserver.exe -lws2_32 -lpqxx -lpq</code></pre>
+              </div>
+
+              <div class="doc-snippet">
+                <div class="doc-snippet-title">
+                  <span>Linux Compilation (g++)</span>
+                  <button class="copy-btn" onclick="copySnippet(this)">Copy</button>
+                </div>
+                <pre><code>g++ httpserver.cpp -o httpserver -lpqxx -lpq -pthread</code></pre>
+              </div>
+
+              <div class="doc-snippet">
+                <div class="doc-snippet-title">
+                  <span>Spin up PostgreSQL with Docker</span>
+                  <button class="copy-btn" onclick="copySnippet(this)">Copy</button>
+                </div>
+                <pre><code>docker run --name pg-test -e POSTGRES_PASSWORD=root -p 5432:5432 -d postgres</code></pre>
+              </div>
+            </div>
+
+            <!-- Tab: Troubleshooting -->
+            <div class="tab-pane" id="tabDiagnose">
+              <p class="doc-desc">Common errors when integrating C++ HTTP servers with PostgreSQL databases:</p>
+              
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div class="alert-box alert-info" style="margin-bottom: 0; background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.2);">
+                  <i data-lucide="alert-triangle" style="color: var(--danger);"></i>
+                  <div>
+                    <strong style="color: #fff; font-size: 0.85rem;">Error: connection to database failed</strong>
+                    <p style="font-size: 0.8rem; margin-top: 4px; color: var(--text-secondary);">Verify that the PostgreSQL service is actively running and listening on port 5432. Double-check your host address IP (e.g. 127.0.0.1) and check firewall credentials.</p>
+                  </div>
+                </div>
+
+                <div class="alert-box alert-info" style="margin-bottom: 0; background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.2);">
+                  <i data-lucide="help-circle" style="color: var(--warning);"></i>
+                  <div>
+                    <strong style="color: #fff; font-size: 0.85rem;">Error: password authentication failed for user</strong>
+                    <p style="font-size: 0.8rem; margin-top: 4px; color: var(--text-secondary);">The password specified in the C++ pqxx connection string does not match the PostgreSQL credentials. Update the connection builder and update the server code accordingly.</p>
+                  </div>
+                </div>
+
+                <div class="alert-box alert-info" style="margin-bottom: 0; background: rgba(99, 102, 241, 0.05); border-color: rgba(99, 102, 241, 0.2);">
+                  <i data-lucide="server" style="color: var(--primary);"></i>
+                  <div>
+                    <strong style="color: #fff; font-size: 0.85rem;">Why is my modified index.html not loading?</strong>
+                    <p style="font-size: 0.8rem; margin-top: 4px; color: var(--text-secondary);">The server reads <code>index.html</code> into RAM cache on startup. Re-run or restart the C++ executable to load changes: <code>Ctrl+C</code> then restart.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- Features Section Grid -->
+    <section class="features-section">
+      <div style="text-align: center; margin-bottom: 40px;">
+        <h2 style="font-size: 1.75rem; font-weight: 800; color: #fff; margin-bottom: 10px;">High-Performance Server Architecture</h2>
+        <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto;">Below are the structural components that power the PgConnect test bench platform.</p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i data-lucide="zap"></i>
+          </div>
+          <h3>cpp-httplib Routing</h3>
+          <p>Multi-threaded HTTP router providing simple Get/Post mappings, CORS middleware support, and blazing fast routing latency (sub-millisecond handler processing).</p>
+        </div>
+        <!-- Feature 2 -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i data-lucide="database"></i>
+          </div>
+          <h3>pqxx Connection API</h3>
+          <p>Official C++ driver bindings implementing standard transaction encapsulation (pqxx::work) with strong exceptions handling to prevent thread pool leaks.</p>
+        </div>
+        <!-- Feature 3 -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i data-lucide="power"></i>
+          </div>
+          <h3>Graceful Shutdown</h3>
+          <p>Detects standard OS terminate interrupts (SIGINT/SIGTERM) to clean up ongoing HTTP request handles and close database connections cleanly without segmentation faults.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-content">
+      <div class="footer-links">
+        <a href="https://github.com/yhirose/cpp-httplib" target="_blank" rel="noopener">cpp-httplib</a>
+        <a href="https://github.com/jtv/libpqxx" target="_blank" rel="noopener">libpqxx</a>
+        <a href="https://www.postgresql.org" target="_blank" rel="noopener">PostgreSQL</a>
+      </div>
+      <div class="footer-signature">
+        <span>Designed for PgConnect DB Sandbox &copy; 2026. Crafted with 💜 by </span>
+        <a href="https://github.com/vinskeeper" target="_blank" class="creator-footer-link">
+          <i data-lucide="github" style="width: 13px; height: 13px; display: inline-block; vertical-align: middle;"></i> vinskeeper
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast-host" id="toastHost"></div>
+
+  <!-- Main External Script -->
+  <script src="js/app.js"></script>
+</body>
+</html>

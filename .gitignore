@@ -1,0 +1,35 @@
+# Compiled Executables & Binaries
+*.exe
+httpserver
+httpserver.exe
+*.out
+*.app
+
+# Object files & Libraries
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+
+# Local Configuration & Secrets
+.env
+.env.local
+.env.*.local
+
+# IDEs and Editors
+.vscode/
+.idea/
+.agents/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# OS System Files
+.DS_Store
+Thumbs.db
+desktop.ini
